@@ -1,0 +1,9 @@
+@Library('scp-model-pipeline') _
+
+scpModelPipeline this,
+    testsInvocationCommand: '-c "python -m pytest -m \"not integration\" --strict-markers unittest_reinvent/"',
+    sleepCommand: '-c "sleep 3600"',
+    imgRepository: 'add-reinvent-cli',
+    envVarsFromSecrets: ['REMOTE_LOGGING_AUTH_TOKEN': 'reinvent-jwt', 'PIP_KEY': 'pip-key'],
+    SCPDestinationFolder: '/opt/scp/services/reinvent/singularity_images',
+    singularityFilePrefix: 'ReinventCLI'

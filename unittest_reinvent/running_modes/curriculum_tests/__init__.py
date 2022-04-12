@@ -3,3 +3,6 @@ from unittest_reinvent.running_modes.curriculum_tests.test_manual_curriculum_lea
 
 from unittest_reinvent.running_modes.curriculum_tests.test_automated_curriculum_learning import \
     TestAutomatedCurriculumLearning
+from unittest_reinvent.running_modes.curriculum_tests.test_no_curriculum_patformer import TestNoCurriculumPatformer
+from unittest_reinvent.running_modes.curriculum_tests.test_patformer_curriculum_learning import \
+    TestPatformerCurriculumLearning

@@ -6,3 +6,4 @@ class ModelTypeEnum:
     DEFAULT = "default"
     LIB_INVENT = "lib_invent"
     LINK_INVENT = "link_invent"
+    PATFORMER = "patformer"
