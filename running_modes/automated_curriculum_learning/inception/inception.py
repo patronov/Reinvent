@@ -1,50 +1,19 @@
-import numpy as np
-import pandas as pd
-from typing import Tuple, List
+from typing import Union
 
-from reinvent_chemistry.conversions import Conversions
+from reinvent_models.model_factory.generative_model_base import GenerativeModelBase
+from reinvent_models.model_factory.link_invent_adapter import LinkInventAdapter
 
-from running_modes.configurations import InceptionConfiguration
+from running_modes.automated_curriculum_learning.inception.base_inception import BaseInception
+from running_modes.automated_curriculum_learning.inception.link_invent_inception import LinkInventInception
+from running_modes.automated_curriculum_learning.inception.reinvent_inception import ReinventInception
+from running_modes.configurations import ProductionStrategyInputConfiguration, CurriculumStrategyInputConfiguration
+from running_modes.enums.production_strategy_enum import ProductionStrategyEnum
 
 
 class Inception:
-    def __init__(self, configuration: InceptionConfiguration, scoring_function, prior):
-        self.configuration = configuration
-        self._chemistry = Conversions()
-        self.memory: pd.DataFrame = pd.DataFrame(columns=['smiles', 'score', 'likelihood'])
-        self._load_to_memory(scoring_function, prior, self.configuration.smiles)
-
-
-    def _load_to_memory(self, scoring_function, prior, smiles):
-        if len(smiles):
-            standardized_and_nulls = [self._chemistry.convert_to_rdkit_smiles(smile) for smile in smiles]
-            standardized = [smile for smile in standardized_and_nulls if smile is not None]
-            self.evaluate_and_add(standardized, scoring_function, prior)
-
-    def _purge_memory(self):
-        unique_df = self.memory.drop_duplicates(subset=["smiles"])
-        sorted_df = unique_df.sort_values('score', ascending=False)
-        self.memory = sorted_df.head(self.configuration.memory_size)
-
-    def evaluate_and_add(self, smiles, scoring_function, prior):
-        if len(smiles) > 0:
-            score = scoring_function.get_final_score(smiles)
-            likelihood = prior.likelihood_smiles(smiles)
-            df = pd.DataFrame({"smiles": smiles, "score": score.total_score, "likelihood": -likelihood.detach().cpu().numpy()})
-            self.memory = self.memory.append(df)
-            self._purge_memory()
-
-    def add(self, smiles, score, neg_likelihood):
-        df = pd.DataFrame({"smiles": smiles, "score": score, "likelihood": neg_likelihood.detach().cpu().numpy()})
-        self.memory = self.memory.append(df)
-        self._purge_memory()
-
-    def sample(self) -> Tuple[List[str], np.array, np.array]:
-        sample_size = min(len(self.memory), self.configuration.sample_size)
-        if sample_size > 0:
-            sampled = self.memory.sample(sample_size)
-            smiles = sampled["smiles"].values
-            scores = sampled["score"].values
-            prior_likelihood = sampled["likelihood"].values
-            return smiles, scores, prior_likelihood
-        return [], [], []
+    def __new__(cls, configuration: Union[ProductionStrategyInputConfiguration, CurriculumStrategyInputConfiguration], scoring_function, prior: Union[LinkInventAdapter, GenerativeModelBase]) -> BaseInception:
+        production_strategy_enum = ProductionStrategyEnum()
+        if configuration.name == production_strategy_enum.LINK_INVENT:
+            return LinkInventInception(configuration, scoring_function, prior)
+        if configuration.name == production_strategy_enum.STANDARD:
+            return ReinventInception(configuration.inception, scoring_function, prior)

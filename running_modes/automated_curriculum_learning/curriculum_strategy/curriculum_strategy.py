@@ -26,7 +26,7 @@ class CurriculumStrategy:
         curriculum_strategy_enum = CurriculumStrategyEnum()
         first_objective = configuration.curriculum_objectives[0]
         first_scoring_function_instance = ScoringFunctionFactory(first_objective.scoring_function)
-        inception = Inception(configuration.inception, first_scoring_function_instance, prior)
+        inception = Inception(configuration, first_scoring_function_instance, prior)
         diversity_filter = DiversityFilter(configuration.diversity_filter)
 
         if curriculum_strategy_enum.USER_DEFINED == configuration.name:

@@ -1,5 +1,4 @@
 import time
-from abc import abstractmethod
 from typing import List
 
 import torch
@@ -40,7 +39,7 @@ class LinkInventProductionStrategy(BaseProductionStrategy):
         # 2. Scoring
         score_summary = self._scoring(scoring_function, sampled_sequences, step)
         # 3. Updating
-        dto = self._updating(sampled_sequences, score_summary.total_score, learning_strategy, agent)
+        dto = self._updating(sampled_sequences, score_summary, learning_strategy, agent)
         # 4. Logging
         self._logging(start_time, step, score_summary, dto, agent)
 
@@ -53,7 +52,7 @@ class LinkInventProductionStrategy(BaseProductionStrategy):
         sampled_sequences = sampling_action.run(self._parameters.input)
         return sampled_sequences
 
-    def _scoring(self, scoring_function, sampled_sequences, step: int) -> FinalSummary:
+    def _scoring(self, scoring_function, sampled_sequences: List[SampledSequencesDTO], step: int) -> FinalSummary:
         score_summary = self._apply_scoring_function(scoring_function, sampled_sequences, step)
         score_summary = self._clean_scored_smiles(score_summary)
         loggable_data = [UpdateLoggableDataDTO(dto.input, dto.output, dto.nll) for dto in sampled_sequences]
@@ -61,9 +60,9 @@ class LinkInventProductionStrategy(BaseProductionStrategy):
         score_summary.total_score = self._diversity_filter.update_score(dto)
         return score_summary
 
-    def _updating(self, sampled_sequences, score, learning_strategy, agent) -> UpdatedLikelihoodsDTO:
+    def _updating(self, sampled_sequences: List[SampledSequencesDTO], score_summary: FinalSummary, learning_strategy, agent) -> UpdatedLikelihoodsDTO:
         likelihood_dto = agent.likelihood_smiles(sampled_sequences)
-        dto = learning_strategy.run(likelihood_dto, score)
+        dto = learning_strategy.run(likelihood_dto, score_summary.total_score)
         return dto
 
     def _logging(self, start_time, step, score_summary, dto: UpdatedLikelihoodsDTO, agent):

@@ -26,7 +26,7 @@ class AutomatedCurriculumRunner(BaseRunningMode):
         if self._config.production_strategy.retain_inception:
             production_inception = self._curriculum_strategy.inception
         else:
-            production_inception = Inception(self._config.production_strategy.inception, production_sf, self._prior)
+            production_inception = Inception(self._config.production_strategy, production_sf, self._prior)
 
         self.production_strategy = ProductionStrategy(prior=self._prior, inception=production_inception,
                                                       configuration=self._config.production_strategy,

@@ -10,7 +10,7 @@ from reinvent_scoring.scoring.diversity_filters.curriculum_learning.diversity_fi
 from reinvent_scoring.scoring.function.base_scoring_function import BaseScoringFunction
 
 from running_modes.automated_curriculum_learning.dto import CurriculumOutcomeDTO
-from running_modes.automated_curriculum_learning.inception.inception import Inception
+from running_modes.automated_curriculum_learning.inception.base_inception import BaseInception
 from running_modes.automated_curriculum_learning.learning_strategy.learning_strategy import LearningStrategy
 from running_modes.automated_curriculum_learning.logging.base_logger import BaseLogger
 from running_modes.configurations import CurriculumStrategyConfiguration
@@ -21,7 +21,7 @@ from running_modes.configurations.automated_curriculum_learning.curriculum_strat
 class BaseCurriculumStrategy(ABC):
     def __init__(self, prior: GenerativeModelBase, agent: GenerativeModelBase,
                  configuration: Union[CurriculumStrategyConfiguration, CurriculumStrategyInputConfiguration],
-                 diversity_filter: BaseDiversityFilter, inception: Inception,
+                 diversity_filter: BaseDiversityFilter, inception: BaseInception,
                  logger: BaseLogger):
 
         self._bond_maker = BondMaker()

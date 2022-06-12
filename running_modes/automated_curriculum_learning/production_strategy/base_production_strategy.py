@@ -8,14 +8,14 @@ from reinvent_scoring.scoring.diversity_filters.curriculum_learning.base_diversi
 from reinvent_scoring.scoring.function.base_scoring_function import BaseScoringFunction
 
 from running_modes.automated_curriculum_learning.dto import CurriculumOutcomeDTO
-from running_modes.automated_curriculum_learning.inception.inception import Inception
+from running_modes.automated_curriculum_learning.inception.base_inception import BaseInception
 from running_modes.automated_curriculum_learning.logging.base_logger import BaseLogger
 from running_modes.configurations.automated_curriculum_learning.prodcution_strategy_input_configuration import \
     ProductionStrategyInputConfiguration
 
 
 class BaseProductionStrategy(ABC):
-    def __init__(self, prior: GenerativeModelBase, diversity_filter: BaseDiversityFilter, inception: Inception,
+    def __init__(self, prior: GenerativeModelBase, diversity_filter: BaseDiversityFilter, inception: BaseInception,
                  scoring_function: BaseScoringFunction, configuration: ProductionStrategyInputConfiguration,
                  logger: BaseLogger):
 

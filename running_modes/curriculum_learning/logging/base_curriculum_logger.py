@@ -2,15 +2,16 @@ import json
 import logging
 import os
 from abc import ABC, abstractmethod
+
 import numpy as np
 import torch
 from reinvent_scoring import ComponentSpecificParametersEnum
-
-from running_modes.automated_curriculum_learning.inception.inception import Inception
-from running_modes.configurations.general_configuration_envelope import GeneralConfigurationEnvelope
-from running_modes.configurations.logging.reinforcement_log_configuration import ReinforcementLoggerConfiguration
 from reinvent_scoring.scoring.enums.scoring_function_component_enum import ScoringFunctionComponentNameEnum
 from reinvent_scoring.scoring.score_summary import FinalSummary
+
+from running_modes.automated_curriculum_learning.inception.base_inception import BaseInception
+from running_modes.configurations.general_configuration_envelope import GeneralConfigurationEnvelope
+from running_modes.configurations.logging.reinforcement_log_configuration import ReinforcementLoggerConfiguration
 
 
 class BaseCurriculumLogger(ABC):
@@ -39,7 +40,8 @@ class BaseCurriculumLogger(ABC):
         with open(output_file, 'w') as f:
             f.write(jsonstr)
 
-    def log_out_inception(self, inception: Inception):
+    #TODO: implement a get method
+    def log_out_inception(self, inception: BaseInception):
         inception.memory.to_csv(f"{self._log_config.result_folder}/memory.csv")
 
     def save_checkpoint(self, step, scaffold_filter, agent):
